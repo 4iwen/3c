@@ -15,6 +15,7 @@ option(TC_BUILD_SHARED "Build 3c as shared library" ON)
 set(
         SOURCE_FILES
 
+        src/core/core.cpp
         src/core/log.cpp
         src/window/window.cpp
 )

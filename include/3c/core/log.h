@@ -5,13 +5,18 @@
 #include <spdlog/spdlog.h>
 
 namespace tc {
+    class Core; // Forward declaration
+
     class TC_API Log {
     public:
-        static void init();
-
         static std::shared_ptr<spdlog::logger> &getLogger() {
             return s_loggerInstance;
         }
+
+    private:
+        static void init();
+
+        friend class Core;
 
     private:
         static std::shared_ptr<spdlog::logger> s_loggerInstance;
