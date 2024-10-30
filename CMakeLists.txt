@@ -71,7 +71,6 @@ add_subdirectory(deps/glad) # OpenGL loader
 
 set(SPDLOG_BUILD_EXAMPLES OFF)
 set(SPDLOG_BUILD_TESTS OFF)
-set(SPDLOG_ENABLE_PCH ON)
 add_subdirectory(deps/spdlog) # Logging
 
 target_link_libraries(
