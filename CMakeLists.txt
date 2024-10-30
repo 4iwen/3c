@@ -78,11 +78,12 @@ target_link_libraries(
 
         glfw
         glad
+        spdlog
 )
 
 # --------------------------------------------- [Include directories] ------------------------------------------------ #
 target_include_directories(
-        3c PRIVATE
+        3c PUBLIC
 
         deps/glfw/include
         deps/glad/include
