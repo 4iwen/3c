@@ -7,5 +7,5 @@
 #elif defined(__linux__)
 #define TC_PLATFORM_LINUX
 #else
-#error "Platform not supported!"
+#error "Platform not supported"
 #endif

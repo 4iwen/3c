@@ -9,9 +9,8 @@
 #elif defined(TC_PLATFORM_MACOS) || defined(TC_PLATFORM_LINUX)
 #define TC_DEBUG_BREAK() __builtin_trap()
 #else
-#error "Debug break for this platform is not supported!"
+#error "Debug break for this platform is not supported"
 #endif
-
 #define TC_ASSERT(condition, ...) { \
     if (!(condition)) { \
         TC_ERROR(__VA_ARGS__); \

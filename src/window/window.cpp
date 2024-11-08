@@ -1,27 +1,21 @@
 #include "pch.h"
 
 #include "3c/window/window.h"
-
 #include "3c/core/assert.h"
-
-#include <GLFW/glfw3.h>
+#include "3c/window/glfw/glfw_window.h"
 
 namespace tc {
-    std::unique_ptr<Window> Window::create(
+    std::shared_ptr<Window> Window::create(
         const std::string &title,
-        const int32_t width,
-        const int32_t height
+        uint32_t width,
+        uint32_t height,
+        WindowBackendType backendType
     ) {
-        TC_ASSERT(glfwInit(), "Failed to initialize GLFW!");
-
-        std::unique_ptr<Window> window = std::make_unique<Window>();
-
-        window->m_windowHandle = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-        if (window == nullptr) {
-            glfwTerminate();
-            TC_ASSERT(false, "Failed to create window!");
+        switch (backendType) {
+            default:
+                TC_ASSERT(false, "No window backend selected");
+            case WindowBackendType::GLFW:
+                return std::make_shared<GlfwWindow>(title, width, height);
         }
-
-        return window;
     }
 } // namespace tc

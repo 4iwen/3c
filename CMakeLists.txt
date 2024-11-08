@@ -15,9 +15,21 @@ option(TC_BUILD_SHARED "Build 3c as shared library" ON)
 set(
         SOURCE_FILES
 
-        src/core/core.cpp
+        src/context.cpp
         src/core/log.cpp
         src/window/window.cpp
+        src/window/glfw/glfw_window.cpp
+        src/graphics/renderer.cpp
+        src/graphics/vertex_array.cpp
+        src/graphics/vertex_buffer.cpp
+        src/graphics/index_buffer.cpp
+        src/graphics/shader.cpp
+        src/graphics/opengl/opengl_renderer.cpp
+        src/graphics/opengl/opengl_vertex_array.cpp
+        src/graphics/opengl/opengl_vertex_buffer.cpp
+        src/graphics/opengl/opengl_index_buffer.cpp
+        src/graphics/opengl/opengl_shader.cpp
+        include/3c/events/event.h
 )
 
 if (TC_BUILD_SHARED)
@@ -73,12 +85,18 @@ set(SPDLOG_BUILD_EXAMPLES OFF)
 set(SPDLOG_BUILD_TESTS OFF)
 add_subdirectory(deps/spdlog) # Logging
 
+set(GLM_BUILD_LIBRARY OFF)
+set(GLM_BUILD_TESTS OFF)
+set(GLM_BUILD_INSTALL OFF)
+add_subdirectory(deps/glm) # Math
+
 target_link_libraries(
         3c PRIVATE
 
         glfw
         glad
         spdlog
+        glm
 )
 
 # --------------------------------------------- [Include directories] ------------------------------------------------ #
@@ -88,6 +106,7 @@ target_include_directories(
         deps/glfw/include
         deps/glad/include
         deps/spdlog/include
+        deps/glm
 
         include
         src

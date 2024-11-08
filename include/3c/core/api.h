@@ -16,7 +16,7 @@
 #define TC_API
 #endif
 #else
-#error Platform not supported!
+#error Platform not supported
 #endif
 #else
 #define TC_API

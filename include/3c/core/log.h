@@ -3,23 +3,23 @@
 #include "3c/core/api.h"
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace tc {
-    class Core; // Forward declaration
-
     class TC_API Log {
     public:
         static std::shared_ptr<spdlog::logger> &getLogger() {
-            return s_loggerInstance;
+            static std::shared_ptr<spdlog::logger> instance = spdlog::stdout_color_mt("logger");
+            return instance;
         }
 
     private:
         static void init();
 
-        friend class Core;
+        static void shutdown();
 
-    private:
-        static std::shared_ptr<spdlog::logger> s_loggerInstance;
+        friend class Context;
+
     };
 } // namespace tc
 
