@@ -37,21 +37,19 @@ namespace tc {
 
         const std::shared_ptr<Renderer> &getRenderer() { return m_data.renderer; }
 
-        const std::vector<EventCallback> &getEventCallbacks() { return m_eventCallbacks; }
-
-        void setEventCallback(const EventCallback &callback) {
-            m_eventCallbacks.emplace_back(callback);
+        void setUserEventCallback(const EventCallback &callback) {
+            m_data.m_userEventCallback = callback;
         }
 
-        void callEventCallbacks(Event &event) {
-            for (auto &callback: m_eventCallbacks) {
-                callback(event);
-            }
+    private:
+        void setEngineEventCallback(const EventCallback &callback) {
+            m_data.m_engineEventCallback = callback;
         }
 
-        Context(Context const &) = delete;
+        void callEventCallbacks(Event &event);
 
-        void operator=(Context const &) = delete;
+        // window classes need to access callbacks
+        friend class GlfwWindow;
 
     private:
         static Context *m_instance;
@@ -59,8 +57,8 @@ namespace tc {
         struct ContextData {
             std::shared_ptr<Window> window;
             std::shared_ptr<Renderer> renderer;
+            EventCallback m_engineEventCallback;
+            EventCallback m_userEventCallback;
         } m_data;
-
-        std::vector<EventCallback> m_eventCallbacks;
     };
 } // namespace tc

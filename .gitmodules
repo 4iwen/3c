@@ -14,3 +14,11 @@
 	path = deps/glm
 	url = https://github.com/4iwen/glm
 	branch = master
+[submodule "deps/stb"]
+	path = deps/stb
+	url = https://github.com/4iwen/stb/
+	branch = master
+[submodule "deps/FastNoise2"]
+	path = deps/FastNoise2
+	url = https://github.com/4iwen/FastNoise2
+	branch = master

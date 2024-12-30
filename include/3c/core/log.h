@@ -9,8 +9,7 @@ namespace tc {
     class TC_API Log {
     public:
         static std::shared_ptr<spdlog::logger> &getLogger() {
-            static std::shared_ptr<spdlog::logger> instance = spdlog::stdout_color_mt("logger");
-            return instance;
+            return s_instance;
         }
 
     private:
@@ -20,6 +19,8 @@ namespace tc {
 
         friend class Context;
 
+    private:
+        static std::shared_ptr<spdlog::logger> s_instance;
     };
 } // namespace tc
 

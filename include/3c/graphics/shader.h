@@ -35,8 +35,14 @@ namespace tc {
 
         virtual void setMat4(const std::string &name, const glm::mat4 &value) = 0;
 
-        static std::shared_ptr<Shader> create(const std::string &vertexSource, const std::string &fragmentSource);
+        static std::shared_ptr<Shader> create(
+            const std::string &vertexSource,
+            const std::string &fragmentSource
+        );
 
-        static std::shared_ptr<Shader> createFromFile(const std::string &vertexPath, const std::string &fragmentPath);
+        static std::shared_ptr<Shader> createFromFile(
+            const std::string &vertexPath,
+            const std::string &fragmentPath
+        );
     };
 } // namespace tc

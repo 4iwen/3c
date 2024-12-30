@@ -56,10 +56,12 @@ namespace tc {
 
         virtual void unbind() = 0;
 
+        virtual void setData(const std::vector<float> &vertices) = 0;
+
         virtual void setLayout(const BufferLayout &layout) = 0;
 
         virtual const BufferLayout &getLayout() const = 0;
 
-        static std::shared_ptr<VertexBuffer> create(const std::vector<float> &vertices);
+        static std::shared_ptr<VertexBuffer> create();
     };
 } // namespace tc

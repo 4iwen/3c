@@ -29,6 +29,8 @@ namespace tc {
             default:
                 TC_ASSERT(false, "Unknown buffer layout element type");
         }
+
+        return 0;
     }
 
     BufferLayoutElement::BufferLayoutElement(
@@ -58,12 +60,12 @@ namespace tc {
         return m_stride;
     }
 
-    std::shared_ptr<VertexBuffer> VertexBuffer::create(const std::vector<float> &vertices) {
+    std::shared_ptr<VertexBuffer> VertexBuffer::create() {
         switch (Renderer::getGraphicsAPIType()) {
             default:
                 TC_ASSERT(false, "No graphics API selected");
             case GraphicsAPIType::OPENGL:
-                return std::make_shared<OpenGLVertexBuffer>(vertices);
+                return std::make_shared<OpenGLVertexBuffer>();
         }
     }
 } // namespace tc

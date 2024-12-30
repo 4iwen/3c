@@ -15,7 +15,7 @@ namespace tc {
         if (success == GL_FALSE) {
             GLint length = 0;
             glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-            std::vector<char> error(length);
+            std::vector<char> error(static_cast<size_t>(length));
             glGetProgramInfoLog(program, length, &length, error.data());
             TC_ERROR("Failed to link program:\n{0}", error.data());
         }
@@ -41,7 +41,7 @@ namespace tc {
         if (success == GL_FALSE) {
             GLint length = 0;
             glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-            std::vector<char> error(length);
+            std::vector<char> error(static_cast<size_t>(length));
             glGetShaderInfoLog(shader, length, &length, error.data());
             TC_ERROR("Failed to compile {0} shader:\n{1}", type, error.data());
         }

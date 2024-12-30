@@ -6,27 +6,27 @@
 
 namespace tc {
     struct TC_API WindowResizeEvent : Event {
-        WindowResizeEvent(uint32_t width, uint32_t height): m_width(width), m_height(height) {
+        WindowResizeEvent(int32_t width, int32_t height): m_width(width), m_height(height) {
         }
 
-        EventType getType() override { return EventType::WINDOW_RESIZE; }
+        EVENT_TYPE(WINDOW_RESIZE);
 
-        uint32_t getWidth() const { return m_width; }
-        uint32_t getHeight() const { return m_height; }
+        int32_t getWidth() const { return m_width; }
+        int32_t getHeight() const { return m_height; }
 
     private:
-        uint32_t m_width, m_height;
+        int32_t m_width, m_height;
     };
 
     struct TC_API WindowCloseEvent : Event {
-        EventType getType() override { return EventType::WINDOW_CLOSE; }
+        EVENT_TYPE(WINDOW_CLOSE);
     };
 
     struct TC_API WindowFocusEvent : Event {
-        EventType getType() override { return EventType::WINDOW_FOCUS; }
+        EVENT_TYPE(WINDOW_FOCUS);
     };
 
     struct TC_API WindowLostFocusEvent : Event {
-        EventType getType() override { return EventType::WINDOW_LOST_FOCUS; }
+        EVENT_TYPE(WINDOW_LOST_FOCUS);
     };
 } // namespace tc

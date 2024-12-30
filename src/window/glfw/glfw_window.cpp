@@ -18,15 +18,15 @@ namespace tc {
     }
 
     GlfwWindow::GlfwWindow(const std::string &title, uint32_t width, uint32_t height) {
-        glfwSetErrorCallback(glfwErrorCallback);
-
         TC_ASSERT(glfwInit(), "Failed to initialize GLFW");
         TC_INFO("Initialized GLFW");
+
+        glfwSetErrorCallback(glfwErrorCallback);
 
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef TC_PLATFORM_MACOS
+#if defined(TC_PLATFORM_MACOS)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
         m_windowHandle = glfwCreateWindow(
@@ -43,15 +43,13 @@ namespace tc {
 
         glfwMakeContextCurrent(m_windowHandle);
 
-        if (!gladLoadGL(glfwGetProcAddress)) {
-            glfwTerminate();
-            TC_ASSERT(false, "Failed to initialize GLAD");
-        }
-        TC_INFO("Initialized GLAD");
+        m_input = std::make_unique<GlfwInput>();
 
         setGlfwCallbacks();
 
-        Context::get()->setEventCallback(TC_BIND_CALLBACK(onEvent));
+        Context::get()->setEngineEventCallback(TC_BIND_CALLBACK(onEvent));
+
+        m_frameTimer.start();
     }
 
     GlfwWindow::~GlfwWindow() {
@@ -62,14 +60,34 @@ namespace tc {
     }
 
     void GlfwWindow::update() {
+        // delta time
+        double currentTime = getTimeSinceCreation();
+        Time::setDeltaTime(static_cast<float>(currentTime - m_lastFrameTime));
+        m_lastFrameTime = static_cast<float>(currentTime);
+
+        // framerate limiting
+        double elapsedTime = m_frameTimer.getElapsedSeconds();
+
+        if (elapsedTime < m_targetFrameTime) {
+            double sleepTime = m_targetFrameTime - elapsedTime;
+
+            if (sleepTime > 0.0) {
+                Time::sleep(sleepTime);
+            }
+        }
+
+        m_frameTimer.reset();
+        m_frameTimer.start();
+
         glfwSwapBuffers(m_windowHandle);
         glfwPollEvents();
     }
 
     void GlfwWindow::onEvent(Event &event) {
-        if (event.getType() == EventType::WINDOW_CLOSE) {
-            close();
-        }
+        EventDispatcher dispatcher(event);
+
+        dispatcher.dispatch<WindowCloseEvent>(TC_BIND_CALLBACK(onClose));
+        dispatcher.dispatch<WindowResizeEvent>(TC_BIND_CALLBACK(onResize));
     }
 
     void GlfwWindow::close() {
@@ -84,13 +102,31 @@ namespace tc {
         return glfwGetTime();
     }
 
+    void GlfwWindow::setVsync(bool enabled) {
+        glfwSwapInterval(enabled ? 1 : 0);
+    }
+
+    void GlfwWindow::setMaxFps(uint32_t maxFps) {
+        if (maxFps > 0) {
+            m_targetFrameTime = 1.0f / static_cast<float>(maxFps);
+        } else {
+            m_targetFrameTime = 0.0f;
+        }
+    }
+
     void GlfwWindow::setGlfwCallbacks() {
         // Window events
         glfwSetWindowSizeCallback(m_windowHandle, [](GLFWwindow *window, int width, int height) {
             TC_UNUSED(window);
+            TC_UNUSED(width);
+            TC_UNUSED(height);
+
+            // workaround for retina displays
+#if defined (TC_PLATFORM_MACOS)
+            glfwGetFramebufferSize(window, &width, &height);
+#endif
 
             WindowResizeEvent event(width, height);
-            // get all the callbacks and call them
             Context::get()->callEventCallbacks(event);
         });
 
@@ -121,17 +157,17 @@ namespace tc {
 
             switch (action) {
                 case GLFW_PRESS: {
-                    KeyPressedEvent event(key, 0);
+                    KeyPressedEvent event(static_cast<KeyCode>(key), 0);
                     Context::get()->callEventCallbacks(event);
                     break;
                 }
                 case GLFW_RELEASE: {
-                    KeyReleasedEvent event(key);
+                    KeyReleasedEvent event(static_cast<KeyCode>(key));
                     Context::get()->callEventCallbacks(event);
                     break;
                 }
                 case GLFW_REPEAT: {
-                    KeyPressedEvent event(key, 1);
+                    KeyPressedEvent event(static_cast<KeyCode>(key), 1);
                     Context::get()->callEventCallbacks(event);
                     break;
                 }
@@ -144,7 +180,7 @@ namespace tc {
         glfwSetCharCallback(m_windowHandle, [](GLFWwindow *window, unsigned int keycode) {
             TC_UNUSED(window);
 
-            KeyTypedEvent event(keycode);
+            KeyTypedEvent event(static_cast<KeyCode>(keycode));
             Context::get()->callEventCallbacks(event);
         });
 
@@ -155,12 +191,12 @@ namespace tc {
 
             switch (action) {
                 case GLFW_PRESS: {
-                    MouseButtonPressedEvent event(button);
+                    MouseButtonPressedEvent event(static_cast<MouseButtonCode>(button));
                     Context::get()->callEventCallbacks(event);
                     break;
                 }
                 case GLFW_RELEASE: {
-                    MouseButtonReleasedEvent event(button);
+                    MouseButtonReleasedEvent event(static_cast<MouseButtonCode>(button));
                     Context::get()->callEventCallbacks(event);
                     break;
                 }
@@ -183,5 +219,30 @@ namespace tc {
             MouseScrolledEvent event(static_cast<float>(xOffset), static_cast<float>(yOffset));
             Context::get()->callEventCallbacks(event);
         });
+    }
+
+    void *GlfwWindow::getHandle() {
+        return m_windowHandle;
+    }
+
+    std::shared_ptr<Input> GlfwWindow::getInput() {
+        return m_input;
+    }
+
+    bool GlfwWindow::onClose(const WindowCloseEvent &event) {
+        TC_UNUSED(event);
+
+        close();
+
+        return false;
+    }
+
+    bool GlfwWindow::onResize(const WindowResizeEvent &event) {
+        int32_t width = event.getWidth();
+        int32_t height = event.getHeight();
+
+        Context::get()->getRenderer()->setViewport(0, 0, width, height);
+
+        return false;
     }
 } // namespace tc

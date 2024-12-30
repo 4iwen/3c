@@ -5,6 +5,8 @@
 #include <spdlog/sinks/basic_file_sink.h>
 
 namespace tc {
+    std::shared_ptr<spdlog::logger> Log::s_instance = spdlog::stdout_color_mt("logger");
+
     void Log::init() {
         spdlog::set_pattern("%T.%e %^%5!l%$: %v");
 

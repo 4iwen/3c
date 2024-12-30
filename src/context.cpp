@@ -29,4 +29,14 @@ namespace tc {
         delete m_instance;
         m_instance = nullptr;
     }
+
+    void Context::callEventCallbacks(Event &event) {
+        if (m_data.m_engineEventCallback) {
+            m_data.m_engineEventCallback(event);
+        }
+
+        if (m_data.m_userEventCallback) {
+            m_data.m_userEventCallback(event);
+        }
+    }
 } // namespace tc

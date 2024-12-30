@@ -11,8 +11,10 @@ namespace tc {
 
         virtual void unbind() = 0;
 
+        virtual void setData(const std::vector<uint32_t> &indices) = 0;
+
         virtual size_t getCount() = 0;
 
-        static std::shared_ptr<IndexBuffer> create(const std::vector<uint32_t> &indices);
+        static std::shared_ptr<IndexBuffer> create();
     };
 } // namespace tc

@@ -2,6 +2,15 @@
 
 #include "3c/core/api.h"
 
+#define EVENT_TYPE(type) \
+    static tc::EventType getTypeStatic() { \
+        return tc::EventType::type; \
+    } \
+    \
+    tc::EventType getType() override { \
+        return getTypeStatic(); \
+    }
+
 namespace tc {
     enum class TC_API EventType {
         NONE,
@@ -33,10 +42,15 @@ namespace tc {
         EventDispatcher(Event &event): m_event(event) {
         }
 
-        void dispatch(EventType type, const EventCallback &func) {
-            if (m_event.getType() == type) {
-                func(m_event);
+        template<typename T, typename C>
+        bool dispatch(const C &callback) {
+            if (m_event.getType() == T::getTypeStatic()) {
+                m_event.handled |= callback(static_cast<T &>(m_event));
+
+                return true;
             }
+
+            return false;
         }
 
     private:

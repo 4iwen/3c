@@ -30,7 +30,7 @@ namespace tc {
         }
     }
 
-    GLenum layoutElementTypeToOpenGLBaseType(BufferLayoutElementType type) {
+    GLenum getLayoutElementGLType(BufferLayoutElementType type) {
         switch (type) {
             case BufferLayoutElementType::FLOAT:
             case BufferLayoutElementType::FLOAT2:
@@ -69,8 +69,10 @@ namespace tc {
     }
 
     void OpenGLVertexArray::addVertexBuffer(const std::shared_ptr<VertexBuffer> &vertexBuffer) {
-        bool hasLayout = vertexBuffer->getLayout().getElements().empty();
-        TC_ASSERT(!hasLayout, "Vertex buffer has no layout");
+        bool hasLayout = !vertexBuffer->getLayout().getElements().empty();
+        if (!hasLayout) {
+            TC_ASSERT(false, "Vertex buffer has no layout");
+        }
 
         m_vertexBuffers.push_back(vertexBuffer);
 
@@ -79,15 +81,15 @@ namespace tc {
 
         const auto &layout = vertexBuffer->getLayout();
         const auto &elements = layout.getElements();
-        for (size_t i = 0; i < elements.size(); i++) {
+        for (GLuint i = 0; i < elements.size(); i++) {
             const auto &element = elements[i];
             glEnableVertexAttribArray(i);
             glVertexAttribPointer(
                 i,
                 getLayoutElementComponentCount(element.type),
-                layoutElementTypeToOpenGLBaseType(element.type),
+                getLayoutElementGLType(element.type),
                 element.normalized ? GL_TRUE : GL_FALSE,
-                layout.getStride(),
+                static_cast<GLsizei>(layout.getStride()),
                 reinterpret_cast<const void *>(element.offset)
             );
         }

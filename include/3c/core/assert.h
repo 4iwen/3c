@@ -3,7 +3,6 @@
 #include "3c/core/platform.h"
 #include "3c/core/log.h"
 
-#ifdef TC_DEBUG
 #if defined(TC_PLATFORM_WINDOWS)
 #define TC_DEBUG_BREAK() __debugbreak()
 #elif defined(TC_PLATFORM_MACOS) || defined(TC_PLATFORM_LINUX)
@@ -17,7 +16,3 @@
         TC_DEBUG_BREAK(); \
     } \
 }
-#else
-#define TC_DEBUG_BREAK()
-#define TC_ASSERT(condition, message, ...)
-#endif

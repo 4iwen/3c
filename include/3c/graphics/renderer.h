@@ -19,7 +19,7 @@ namespace tc {
 
         virtual void submit(const std::shared_ptr<VertexArray> &vertexArray) = 0;
 
-        virtual void setViewport(uint32_t width, uint32_t height) = 0;
+        virtual void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) = 0;
 
         static GraphicsAPIType getGraphicsAPIType() { return s_apiType; }
 

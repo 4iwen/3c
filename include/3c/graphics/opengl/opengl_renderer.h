@@ -1,7 +1,6 @@
 #pragma once
 
 #include "3c/core/api.h"
-
 #include "3c/graphics/renderer.h"
 
 namespace tc {
@@ -15,6 +14,6 @@ namespace tc {
 
         void submit(const std::shared_ptr<VertexArray> &vertexArray) override;
 
-        void setViewport(uint32_t width, uint32_t height) override;
+        void setViewport(int32_t x, int32_t y, int32_t width, int32_t height) override;
     };
 }

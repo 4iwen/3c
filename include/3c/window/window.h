@@ -2,6 +2,7 @@
 
 #include "3c/core/api.h"
 #include "3c/events/event.h"
+#include "3c/input/input.h"
 
 namespace tc {
     enum class TC_API WindowBackendType {
@@ -22,6 +23,14 @@ namespace tc {
         virtual bool shouldClose() = 0;
 
         virtual double getTimeSinceCreation() = 0;
+
+        virtual void setVsync(bool enabled) = 0;
+
+        virtual void setMaxFps(uint32_t maxFps) = 0;
+
+        virtual void *getHandle() = 0;
+
+        virtual std::shared_ptr<Input> getInput() = 0;
 
         static std::shared_ptr<Window> create(
             const std::string &name,

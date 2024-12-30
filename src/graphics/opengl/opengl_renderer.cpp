@@ -3,12 +3,24 @@
 #include "3c/graphics/opengl/opengl_renderer.h"
 
 #include <glad/gl.h>
+#include <GLFW/glfw3.h>
+#include <glm/ext/matrix_transform.hpp>
+
+#define MAX_QUAD_COUNT 1024
+#define MAX_VERTEX_COUNT (MAX_QUAD_COUNT * 4)
+#define MAX_INDEX_COUNT (MAX_QUAD_COUNT * 6)
+#define MAX_TEXTURES 32
 
 namespace tc {
     OpenGLRenderer::OpenGLRenderer() {
-        const char* version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-        const char* vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-        const char* renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
+        if (!gladLoadGL(glfwGetProcAddress)) {
+            TC_ASSERT(false, "Failed to initialize GLAD");
+        }
+        TC_INFO("Initialized GLAD");
+
+        const char *version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
+        const char *vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
+        const char *renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         TC_INFO("OpenGL renderer created:");
         TC_INFO("  Version: {0}", version);
         TC_INFO("  Vendor: {0}", vendor);
@@ -34,10 +46,15 @@ namespace tc {
 
     void OpenGLRenderer::submit(const std::shared_ptr<VertexArray> &vertexArray) {
         vertexArray->bind();
-        glDrawElements(GL_TRIANGLES, vertexArray->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(
+            GL_TRIANGLES,
+            static_cast<GLsizei>(vertexArray->getIndexBuffer()->getCount()),
+            GL_UNSIGNED_INT,
+            nullptr
+        );
     }
 
-    void OpenGLRenderer::setViewport(uint32_t width, uint32_t height) {
-        glViewport(0, 0, width, height);
+    void OpenGLRenderer::setViewport(int32_t x, int32_t y, int32_t width, int32_t height) {
+        glViewport(x, y, width, height);
     }
 }

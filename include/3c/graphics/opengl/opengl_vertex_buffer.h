@@ -6,13 +6,15 @@
 namespace tc {
     class TC_API OpenGLVertexBuffer : public VertexBuffer {
     public:
-        OpenGLVertexBuffer(const std::vector<float> &vertices);
+        OpenGLVertexBuffer();
 
         ~OpenGLVertexBuffer() override;
 
         void bind() override;
 
         void unbind() override;
+
+        void setData(const std::vector<float> &vertices) override;
 
         void setLayout(const BufferLayout &layout) override;
 

@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.21)
 project(3c LANGUAGES CXX)
 
+
 # ------------------------------------------------ [CMake settings] -------------------------------------------------- #
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic")
 
 # --------------------------------------------------- [Options] ------------------------------------------------------ #
 option(TC_BUILD_SHARED "Build 3c as shared library" ON)
@@ -17,19 +19,26 @@ set(
 
         src/context.cpp
         src/core/log.cpp
+        src/core/time.cpp
         src/window/window.cpp
         src/window/glfw/glfw_window.cpp
+        src/input/input.cpp
+        src/input/glfw/glfw_input.cpp
         src/graphics/renderer.cpp
         src/graphics/vertex_array.cpp
         src/graphics/vertex_buffer.cpp
         src/graphics/index_buffer.cpp
         src/graphics/shader.cpp
+        src/graphics/texture.cpp
         src/graphics/opengl/opengl_renderer.cpp
         src/graphics/opengl/opengl_vertex_array.cpp
         src/graphics/opengl/opengl_vertex_buffer.cpp
         src/graphics/opengl/opengl_index_buffer.cpp
         src/graphics/opengl/opengl_shader.cpp
-        include/3c/events/event.h
+        src/graphics/opengl/opengl_texture.cpp
+        src/graphics/camera/orthographic_camera.cpp
+        src/graphics/camera/perspective_camera.cpp
+        src/graphics/renderables/quad.cpp
 )
 
 if (TC_BUILD_SHARED)
@@ -41,14 +50,6 @@ else ()
 endif ()
 
 # --------------------------------------------- [Compile definitions] ------------------------------------------------ #
-if (CMAKE_BUILD_TYPE MATCHES "^[Dd]ebug")
-    target_compile_definitions(
-            3c PRIVATE
-
-            TC_DEBUG
-    )
-endif ()
-
 target_compile_definitions(
         3c PRIVATE
 
@@ -90,6 +91,12 @@ set(GLM_BUILD_TESTS OFF)
 set(GLM_BUILD_INSTALL OFF)
 add_subdirectory(deps/glm) # Math
 
+add_subdirectory(deps/stb) # Image loading
+
+set(FASTNOISE2_NOISETOOL OFF)
+set(FASTNOISE2_TESTS OFF)
+add_subdirectory(deps/FastNoise2) # Noise
+
 target_link_libraries(
         3c PRIVATE
 
@@ -97,6 +104,8 @@ target_link_libraries(
         glad
         spdlog
         glm
+        stb
+        FastNoise2
 )
 
 # --------------------------------------------- [Include directories] ------------------------------------------------ #
@@ -107,6 +116,8 @@ target_include_directories(
         deps/glad/include
         deps/spdlog/include
         deps/glm
+        deps/stb
+        deps/FastNoise2/include
 
         include
         src
@@ -117,4 +128,12 @@ target_precompile_headers(
         3c PRIVATE
 
         src/pch.h
+)
+
+# ----------------------------------------------- [Compiler flags] --------------------------------------------------- #
+target_compile_options(
+        3c PRIVATE
+
+        $<$<CXX_COMPILER_ID:MSVC>:/W4 /WX /permissive- /sdl /analyze>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Werror -pedantic -Wshadow -Wconversion -Wsign-conversion -Wfloat-equal>
 )
